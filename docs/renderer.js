@@ -74,7 +74,6 @@ const colors = new Float32Array([
     0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 ]);
 
-// Índices para las caras del cubo (6 caras, 2 triángulos por cara)
 const indices = new Uint16Array([
     0, 1, 2,  0, 2, 3,
     5, 4, 7,  5, 7, 6,
