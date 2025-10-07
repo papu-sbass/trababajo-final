@@ -2,14 +2,14 @@ const canvas = document.getElementById('glCanvas');
 const gl = canvas.getContext('webgl');
 
 if (!gl) {
-    const pNotif = document.getElementById("notif");
-    pNotif.textContent = "¡WebGL no está soportado en tu navegador!"
+    const pNotif = document.getElementById('notif');
+    pNotif.textContent = '¡WebGL no está soportado en tu navegador!'
 
-    throw new Error("¡WebGL no soportado!");
+    throw new Error('¡WebGL no soportado!');
 }
 
 // Vertex Shader
-const vertexShaderSource = `
+const vertexGLSL = `
     attribute vec3 a_position;
     attribute vec3 a_color;
     uniform mat4 u_modelViewMatrix;
@@ -23,7 +23,7 @@ const vertexShaderSource = `
 `;
 
 // Fragment Shader
-const fragmentShaderSource = `
+const fragmentGLSL = `
     precision mediump float;
     varying vec3 v_color;
 
@@ -36,61 +36,51 @@ function createShader(gl, type, source) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
+    
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error('Error compilando shader:', gl.getShaderInfoLog(shader));
+        console.error('Error compilando shader: ', gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
         return null;
     }
     return shader;
 }
 
-const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexGLSL);
+const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentGLSL);
 
-// Crear programa
 const program = gl.createProgram();
 gl.attachShader(program, vertexShader);
 gl.attachShader(program, fragmentShader);
 gl.linkProgram(program);
 
 if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error('Error enlazando programa:', gl.getProgramInfoLog(program));
+    console.error('Error enlazando programa: ', gl.getProgramInfoLog(program));
 }
 gl.useProgram(program);
 
 const vertices = new Float32Array([
-    // Frente
-    -0.5, -0.5,  0.5,  // 0
-     0.5, -0.5,  0.5,  // 1
-     0.5,  0.5,  0.5,  // 2
-    -0.5,  0.5,  0.5,  // 3
-    // Atrás
-    -0.5, -0.5, -0.5,  // 4
-     0.5, -0.5, -0.5,  // 5
-     0.5,  0.5, -0.5,  // 6
-    -0.5,  0.5, -0.5   // 7
+    -0.5, -0.5,  0.5,
+     0.5, -0.5,  0.5,
+     0.5,  0.5,  0.5,
+    -0.5,  0.5,  0.5,
+    -0.5, -0.5, -0.5,
+     0.5, -0.5, -0.5,
+     0.5,  0.5, -0.5,
+    -0.5,  0.5, -0.5
 ]);
 
 const colors = new Float32Array([
-    // Frente
     1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0,
-    // Atrás
     0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 ]);
 
 // Índices para las caras del cubo (6 caras, 2 triángulos por cara)
 const indices = new Uint16Array([
-    // Frente
     0, 1, 2,  0, 2, 3,
-    // Atrás
     5, 4, 7,  5, 7, 6,
-    // Arriba
     3, 2, 6,  3, 6, 7,
-    // Abajo
     4, 5, 1,  4, 1, 0,
-    // Derecha
     1, 5, 6,  1, 6, 2,
-    // Izquierda
     4, 0, 3,  4, 3, 7
 ]);
 
@@ -128,8 +118,10 @@ let angle = 0;
 
 function render() {
     angle += 0.01;
+    
     const rotationMatrix = mat4.create();
     mat4.rotateY(rotationMatrix, rotationMatrix, angle);
+    
     const finalModelViewMatrix = mat4.create();
     mat4.multiply(finalModelViewMatrix, modelViewMatrix, rotationMatrix);
 
@@ -139,7 +131,6 @@ function render() {
     gl.uniformMatrix4fv(projectionMatrixLocation, false, projectionMatrix);
 
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
-
     requestAnimationFrame(render);
 }
 
