@@ -18,6 +18,10 @@ body {
   font-weight: 700;
   background: #111;
   color: #fff;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  height: 100vh;
 }
 .screen {
   position: relative;
@@ -1118,4 +1122,5 @@ body {
     background-position: 0 -32px;
   }
 }
+
 
